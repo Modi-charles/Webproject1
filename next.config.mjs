@@ -5,9 +5,13 @@ const nextConfig = {
   },
   images: {
     unoptimized: true,
-    domains:['drive.google.com']
+    remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: 'drive.google.com',
+      },
+    ],
   },
- 
 }
 
 export default nextConfig

@@ -6,14 +6,20 @@ async function getPesapalToken() {
     ? 'https://pay.pesapal.com/v3'
     : 'https://cybqa.pesapal.com/pesapalv3'
     const consumer_key = process.env.PESAPAL_CONSUMER_KEY?.trim();
-  const consumer_secret = process.env.PESAPAL_CONSUMER_SECRET?.trim();
+    const consumer_secret = process.env.PESAPAL_CONSUMER_SECRET?.trim();
 
+    console.log("Pesapal Auth Check:", { 
+    isProductionEnv: isProd, 
+    hasKey: !!consumer_key, 
+    hasSecret: !!consumer_secret 
+
+  });
   const res = await fetch(`${baseUrl}/api/Auth/RequestToken`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
     body: JSON.stringify({
-      consumer_key: process.env.PESAPAL_CONSUMER_KEY,
-      consumer_secret: process.env.PESAPAL_CONSUMER_SECRET,
+      consumer_key: consumer_key,
+      consumer_secret: consumer_secret,
     }),
   })
 
