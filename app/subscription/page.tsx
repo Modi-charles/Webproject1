@@ -10,13 +10,20 @@ import { RightSidebar } from '@/components/right-sidebar'
 const PLANS = [
   {
     id: 'one-day',
+    name: '1 Day',
+    price: 3000,
+    duration: '24 Hours',
+    features: ['Unlimited access', 'HD quality', 'Ad-free streaming', 'Download content'],
+  },
+  {
+    id: 'two-day',
     name: '2 Days',
     price: 5000,
     duration: '48 Hours',
     features: ['Unlimited access', 'HD quality', 'Ad-free streaming', 'Download content'],
   },
   {
-    id: 'two-days',
+    id: 'one-week',
     name: 'one week',
     price: 10000,
     duration: '7 days',
@@ -24,7 +31,7 @@ const PLANS = [
     popular: true,
   },
   {
-    id: 'one-week',
+    id: 'one-month',
     name: 'one Month',
     price: 30000,
     duration: '30 days',
