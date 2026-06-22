@@ -3,8 +3,137 @@
 import { useState, useEffect, useCallback } from 'react'
 import { X, CheckCircle2, Loader2, CreditCard, AlertCircle } from 'lucide-react'
 import { useAuth } from '@/lib/auth-context'
-import { SUBSCRIPTION_PLANS } from '@/lib/constants/subscription-plans'
-import { usePayment } from '@/lib/hooks/usePayment'
+
+interface SubscriptionPlan {
+  id: string
+  name: string
+  price: number
+  duration: string
+  durationDays: number
+  popular: boolean
+  features: string[]
+}
+
+const SUBSCRIPTION_PLANS: SubscriptionPlan[] = [
+  {
+    id: 'one-day',
+    name: '1 Day',
+    price: 3000,
+    duration: '24 hours',
+    durationDays: 1,
+    popular: false,
+    features: ['HD streaming', 'Ad-free', '1 device'],
+  },
+  {
+    id: 'two-days',
+    name: '2 Day',
+    price: 5000,
+    duration: '48 hours',
+    durationDays: 2,
+    popular: false,
+    features: ['HD streaming', 'Ad-free', '1 device'],
+  },
+  {
+    id: 'one-week',
+    name: '1 Week',
+    price: 10000,
+    duration: '7 days',
+    durationDays: 7,
+    popular: true,
+    features: ['4K streaming', 'Ad-free', 'Downloads'],
+  },
+  {
+    id: 'one-month',
+    name: '1 Month',
+    price: 30000,
+    duration: '30 days',
+    durationDays: 30,
+    popular: false,
+    features: ['4K + HDR', 'Ad-free', 'Downloads', 'Early access'],
+  },
+]
+
+interface UsePaymentOptions {
+  maxRetries?: number
+}
+
+interface PaymentResult {
+  success: boolean
+  redirectUrl?: string
+  error?: string
+}
+
+interface PaymentPayload {
+  amount: number
+  currency: string
+  email: string
+  phone: string
+  firstName: string
+  lastName: string
+  planName: string
+  orderId: string
+}
+
+function usePayment(options: UsePaymentOptions = {}) {
+  const { maxRetries = 3 } = options
+  const [loading, setLoading] = useState<string | null>(null)
+
+  const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms))
+
+  const initiatePayment = useCallback(
+    async (payload: PaymentPayload): Promise<PaymentResult> => {
+      setLoading(payload.orderId)
+
+      let lastError: Error | null = null
+
+      for (let attempt = 0; attempt <= maxRetries; attempt++) {
+        try {
+          const controller = new AbortController()
+          const timeoutId = setTimeout(() => controller.abort(), 10000)
+
+          const res = await fetch('/api/pesapal/order', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload),
+            signal: controller.signal,
+          })
+
+          clearTimeout(timeoutId)
+
+          if (!res.ok) {
+            throw new Error(`Payment API error: ${res.status} ${res.statusText}`)
+          }
+
+          const data = await res.json()
+
+          if (!data?.redirect_url) {
+            throw new Error('Invalid payment response from server')
+          }
+
+          setLoading(null)
+          return { success: true, redirectUrl: data.redirect_url }
+        } catch (err) {
+          lastError = err instanceof Error ? err : new Error('Unknown error occurred')
+
+          if (attempt < maxRetries && (err instanceof TypeError || (err instanceof Error && err.message.includes('abort')))) {
+            await delay(1000 * (attempt + 1))
+            continue
+          }
+
+          break
+        }
+      }
+
+      const errorMessage = lastError?.message || 'Failed to initiate payment. Please try again.'
+      setLoading(null)
+
+      return { success: false, error: errorMessage }
+    },
+    [maxRetries]
+  )
+
+  return { initiatePayment, loading }
+}
 
 interface SubscriptionModalProps {
   isOpen: boolean
