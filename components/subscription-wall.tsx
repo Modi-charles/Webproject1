@@ -27,6 +27,14 @@ export interface PaymentPlan {
 }
 
 export const PLANS: PaymentPlan[] = [
+   {
+    id: 'plan_basic',
+    name: 'Basic',
+    amount: 3000,
+    currency: 'UGX',
+    interval: '24 hours',
+    features: ['HD streaming', 'Ad-free', '1 device'],
+  },
   {
     id: 'plan_basic',
     name: 'Basic',
