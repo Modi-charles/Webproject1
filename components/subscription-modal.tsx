@@ -21,7 +21,7 @@ const PLANS = [
     features: ['HD streaming', 'Ad-free', '1 device'],
   },
   {
-    id: 'one-day',
+    id: 'two-days',
     name: '2 Day',
     price: 5000,
     duration: '48 hours',
@@ -63,7 +63,7 @@ export function SubscriptionModal({ isOpen, onClose, preselectedPlanId }: Subscr
 
   const handleSelectPlan = async (planId: string) => {
     if (!user) {
-      setError('Please sing in first to subscribe.')
+      setError('Please sign in first to subscribe.')
       return
     }
 
