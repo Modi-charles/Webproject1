@@ -11,6 +11,15 @@ interface SubscriptionModalProps {
 }
 
 const PLANS = [
+   {
+    id: 'one-day',
+    name: '1 Day',
+    price: 3000,
+    duration: '24 hours',
+    durationDays: 1,
+    popular: false,
+    features: ['HD streaming', 'Ad-free', '1 device'],
+  },
   {
     id: 'one-day',
     name: '2 Day',
